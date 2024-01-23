@@ -1,6 +1,3 @@
-// `include "scl_gen.v"
-// `include "sda_gen.v"
-
 module fsm_master #(
     parameter FREQ_DIFF = 4,
     parameter ADDR_LEN  = 7,
@@ -8,6 +5,7 @@ module fsm_master #(
                             )
     (
         input                   clk,
+        input                   rst_n,
         input                   start,
         input [ADDR_LEN-1:0]    add_reg,
         input                   R_W,
@@ -35,6 +33,7 @@ module fsm_master #(
         SCL
         (
             .clk                (clk            ),
+            .rst_n              (rst_n          ),
             .state_master       (state_master   ),
             .rst_count          (rst_count      ),
             .count_ctrl         (count_ctrl     ),
@@ -51,6 +50,7 @@ module fsm_master #(
         .DATA_LEN           (DATA_LEN       )
         ) SDA(
             .clk                (clk            ),
+            .rst_n              (rst_n          ),
             .start              (start          ),
             .scl                (scl            ),
             .count_ctrl         (count_ctrl     ),

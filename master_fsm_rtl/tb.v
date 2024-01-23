@@ -5,7 +5,7 @@ parameter DATA_LEN = 8;
 parameter FREQ_DIFF = 4;
 
 reg clk;
-reg rst;
+reg rst_n;
 reg start;
 reg [ADDR_LEN-1:0] add_reg;
 reg R_W;
@@ -23,6 +23,7 @@ fsm_master #(
 ) FSM_MASTER_DUT
 (
     .clk                (clk        ),
+    .rst_n              (rst_n      ),
     .start              (start      ),
     .add_reg            (add_reg    ),
     .R_W                (R_W        ),
@@ -47,9 +48,9 @@ initial begin
 end
 
 initial begin
-    #CLK_PERIOD rst=0; rst=0; start=0; add_reg={ADDR_LEN{1'b0}}; R_W=0; data_1={DATA_LEN{1'b0}}; data_2={DATA_LEN{1'b0}};
-    #CLK_PERIOD rst=1;
-    #CLK_PERIOD rst=0;
+    #CLK_PERIOD rst_n=1; start=0; add_reg={ADDR_LEN{1'b0}}; R_W=0; data_1={DATA_LEN{1'b0}}; data_2={DATA_LEN{1'b0}};
+    #CLK_PERIOD rst_n=0;
+    #CLK_PERIOD rst_n=1;
     #CLK_PERIOD start=1; add_reg=7'b1010110;
 end
 

@@ -4,6 +4,7 @@ module scl_generate #(
     parameter DATA_LEN      = 8
 )(
     input              clk,
+    input              rst_n,
     input [3:0]        state_master,
     input              rst_count,
     output reg [6:0]   count_ctrl,
