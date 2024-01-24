@@ -1,3 +1,4 @@
+// Master Controller
 module fsm_master #(
     parameter FREQ_DIFF = 4,
     parameter ADDR_LEN  = 7,
