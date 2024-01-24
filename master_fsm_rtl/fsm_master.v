@@ -1,5 +1,7 @@
 module fsm_master #(
     parameter FREQ_DIFF = 4,
+    parameter T_LOW     = 6,
+    parameter T_HIGH    = 4,
     parameter ADDR_LEN  = 7,
     parameter DATA_LEN  = 8
                             )
@@ -27,6 +29,8 @@ module fsm_master #(
 
     scl_generate #(
         .THRESHOLD          (FREQ_DIFF/2    ),
+        .T_LOW              (T_LOW          ),
+        .T_HIGH             (T_HIGH         ),
         .ADDR_LEN           (ADDR_LEN       ),
         .DATA_LEN           (DATA_LEN       )
         ) 

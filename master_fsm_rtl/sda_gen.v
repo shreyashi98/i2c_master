@@ -1,8 +1,9 @@
 module sda_generate #(
-    parameter THRESHOLD     = 2,
-    parameter ADDR_LEN      = 7,
-    parameter DATA_LEN      = 8
-)(
+    parameter THRESHOLD         = 2,
+    parameter ADDR_LEN          = 7,
+    parameter DATA_LEN          = 8,
+    parameter SETUP_SDA_START   = 2
+    )(
     input                       clk,
     input                       rst_n,
     input                       start,
@@ -43,6 +44,7 @@ module sda_generate #(
     parameter Send_NACK       = 4'b1010;
     parameter Stop            = 4'b1011;
 
+//always block for curr_state
     always @(posedge clk or negedge rst_n)
         begin
             if(~rst_n) begin
@@ -50,21 +52,33 @@ module sda_generate #(
             end else begin
                 current_state <= next_state;
             end
+
         end
-    
+    //always block for sda_reg
     always @(posedge clk or negedge rst_n)
     begin
         if(~rst_n) begin
-            sda_reg <= 1'b0;
+            sda_reg <= 1'b1;
         end
-     else 
-        begin
-            if(current_state == Ready)
-            begin
-                if(count_ctrl == 2*THRESHOLD) sda_reg = 0;
+     else begin
+        case (current_state) 
+        Ready : begin
+            if(count_ctrl == (SETUP_SDA_START -1)) begin
+                sda_reg <= 1'b0;
             end
+        end
 
-            else if(current_state == Send_Address)
+     endcase 
+
+     end
+
+        begin
+            // if(current_state == Ready)
+            // begin
+            //     if(count_ctrl == 2*THRESHOLD ) sda_reg = 0;
+            // end
+
+            if(current_state == Send_Address)
             begin
                 if(~scl && ~add_sent && count_ctrl/(2*THRESHOLD) <= 6) sda_reg = add_reg[6 - count_ctrl/(2*THRESHOLD)];
                 else if(~scl && add_sent && R_W)
@@ -132,8 +146,24 @@ module sda_generate #(
         end
     end
 
-
 //Combo Logic for next_state
+always @(*) begin
+    next_state = current_state;
+
+    case(current_state)
+        Idle : begin
+            if(start) begin
+                next_state = Ready;
+            end
+        end
+        // Ready: begin
+            
+        // end
+    endcase
+
+end
+
+
 always @(*) 
 begin
     next_state = current_state;
