@@ -74,7 +74,11 @@ module sda_generate #(
         end
         
         Send_Address : begin
-            if(count_ctrl == T_LOW - SETUP_SDA - 1) sda_reg <= add_reg[(ADDR_LEN - 1) - count];
+            if(count <= ADDR_LEN -1) begin
+                if(count_ctrl == T_LOW - SETUP_SDA - 1) sda_reg <= add_reg[(ADDR_LEN - 1) - count];
+            end else begin
+                if(count_ctrl == T_LOW - SETUP_SDA - 1) sda_reg <= R_W;
+            end
         end
 
      endcase 
@@ -87,20 +91,20 @@ module sda_generate #(
             //     if(count_ctrl == 2*THRESHOLD ) sda_reg = 0;
             // end
 
-            if(current_state == Send_Address)
-            begin
-                if(~scl && ~add_sent && count_ctrl/(2*THRESHOLD) <= 6) sda_reg = add_reg[6 - count_ctrl/(2*THRESHOLD)];
-                else if(~scl && add_sent && R_W)
-                begin
-                    sda_reg    <= R_W;
-                end
-                else if(~scl && add_sent && ~R_W)
-                begin
-                    sda_reg    <= R_W;
-                end
-            end
+            // if(current_state == Send_Address)
+            // begin
+            //     if(~scl && ~add_sent && count_ctrl/(2*THRESHOLD) <= 6) sda_reg = add_reg[6 - count_ctrl/(2*THRESHOLD)];
+            //     else if(~scl && add_sent && R_W)
+            //     begin
+            //         sda_reg    <= R_W;
+            //     end
+            //     else if(~scl && add_sent && ~R_W)
+            //     begin
+            //         sda_reg    <= R_W;
+            //     end
+            // end
 
-            else if(current_state == Read_Data)
+            if(current_state == Read_Data)
             begin
                 sda_reg <= 1'bz;
             end
