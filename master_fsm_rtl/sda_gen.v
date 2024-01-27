@@ -2,13 +2,17 @@ module sda_generate #(
     parameter THRESHOLD         = 2,
     parameter ADDR_LEN          = 7,
     parameter DATA_LEN          = 8,
-    parameter SETUP_SDA_START   = 2
+    parameter SETUP_SDA_START   = 2,
+    parameter SETUP_SDA         = 3,
+    parameter T_HIGH            = 4,
+    parameter T_LOW             = 6
     )(
     input                       clk,
     input                       rst_n,
     input                       start,
     input                       scl,
     input [6:0]                 count_ctrl,
+    input [3:0]                 count,
     input                       wait_for_sync,
     input                       add_sent,
     input                       data_received,
@@ -19,6 +23,7 @@ module sda_generate #(
     input [DATA_LEN-1:0]        data_2,
     inout                       sda,
     output                      rst_count,
+    output                      rst_count_2,
     output [3:0]                state_master,
     output                      free
                                            );
@@ -66,6 +71,10 @@ module sda_generate #(
             if(count_ctrl == (SETUP_SDA_START -1)) begin
                 sda_reg <= 1'b0;
             end
+        end
+        
+        Send_Address : begin
+            if(count_ctrl == T_LOW - SETUP_SDA - 1) sda_reg <= add_reg[(ADDR_LEN - 1) - count];
         end
 
      endcase 
@@ -282,6 +291,7 @@ end
     assign rst_count = (current_state == Idle) || wait_for_sync || free || add_sent || (current_state == Read_Data) || 
                        (current_state == Write_Data) || data_received || (current_state == Check_for_Valid) ||
                        (current_state == Send_ACK) || (current_state == Check_ACK);
+    assign rst_count_2 = wait_for_sync || add_sent;
     assign sda = sda_reg;
 
 endmodule

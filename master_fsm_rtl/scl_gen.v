@@ -10,12 +10,14 @@ module scl_generate #(
     input              rst_n,
     input [3:0]        state_master,
     input              rst_count,
+    input [3:0]        count,
     output reg [6:0]   count_ctrl,
     output reg         scl,
     output             wait_for_sync,
     output             add_sent,
     output             data_received,
-    output             data_sent
+    output             data_sent,
+    output             count_inc
 );
 
     
@@ -122,8 +124,9 @@ always @(posedge clk or negedge rst_n) begin
 end
 
     assign wait_for_sync = (count_ctrl == (SETUP_SCL_START-1)) && (state_master == Ready);
-    assign add_sent      = (count_ctrl == 2*(ADDR_LEN-1)*THRESHOLD) && (state_master == Send_Address);
+    assign add_sent      = (count      == (ADDR_LEN-1)) && (count_ctrl == T_HIGH + T_LOW -1 ) && (state_master == Send_Address);
     assign data_received = (count_ctrl == 2*DATA_LEN*THRESHOLD) && (state_master == Store_Data);
     assign data_sent     = (count_ctrl == 2*DATA_LEN*THRESHOLD) && (state_master == Output_Data);
+    assign count_inc     = (count_ctrl == T_HIGH + T_LOW - 1) && (state_master == Send_Address);
 
 endmodule
