@@ -156,118 +156,126 @@ always @(*) begin
                 next_state = Ready;
             end
         end
-        // Ready: begin
-            
-        // end
+
+        Ready: begin
+           if(wait_for_sync) begin
+                next_state = Send_Address;
+           end
+        end
+
+        Send_Address: begin
+            if(add_sent && R_W) next_state = Read_Data;
+            else if(add_sent && ~R_W) next_state = Write_Data;
+        end
     endcase
 
 end
 
 
-always @(*) 
-begin
-    next_state = current_state;
+// always @(*) 
+// begin
+//     next_state = current_state;
     
-        if(current_state == Idle)
-        begin
-            if(start)
-            begin
-                next_state = Ready;
-            end
-        end
+//         if(current_state == Idle)
+//         begin
+//             if(start)
+//             begin
+//                 next_state = Ready;
+//             end
+//         end
 
-        else if(current_state == Ready)
-        begin
-            if(count_ctrl == 2*THRESHOLD) sda_reg = 0;
-            else if(wait_for_sync)
-            begin
-                next_state  = Send_Address;
-            end
-            else next_state = Ready;
-        end
+//         else if(current_state == Ready)
+//         begin
+//             if(count_ctrl == 2*THRESHOLD) sda_reg = 0;
+//             else if(wait_for_sync)
+//             begin
+//                 next_state  = Send_Address;
+//             end
+//             else next_state = Ready;
+//         end
 
-        else if(current_state == Send_Address)
-        begin
-            if(~scl && add_sent && R_W)
-            begin
-                next_state = Read_Data;
-            end
-            else if(~scl && add_sent && ~R_W)
-            begin
-                next_state = Write_Data;
-            end
-        end
+//         else if(current_state == Send_Address)
+//         begin
+//             if(~scl && add_sent && R_W)
+//             begin
+//                 next_state = Read_Data;
+//             end
+//             else if(~scl && add_sent && ~R_W)
+//             begin
+//                 next_state = Write_Data;
+//             end
+//         end
 
-        else if(current_state == Read_Data)
-        begin
-            if(~scl)
-            begin
-                if(sda) next_state = Store_Data;
-                else    next_state = Stop;
-            end
-        end
+//         else if(current_state == Read_Data)
+//         begin
+//             if(~scl)
+//             begin
+//                 if(sda) next_state = Store_Data;
+//                 else    next_state = Stop;
+//             end
+//         end
 
-        else if(current_state == Store_Data)
-        begin
-            if(data_received)
-            begin
-                next_state = Check_for_Valid;
-            end
-        end
+//         else if(current_state == Store_Data)
+//         begin
+//             if(data_received)
+//             begin
+//                 next_state = Check_for_Valid;
+//             end
+//         end
 
-        else if(current_state == Check_for_Valid)
-        begin
-            if(data_mem[no_of_data_rec] != 8'hFF) next_state = Send_ACK;
-            else next_state = Send_NACK;
-        end
+//         else if(current_state == Check_for_Valid)
+//         begin
+//             if(data_mem[no_of_data_rec] != 8'hFF) next_state = Send_ACK;
+//             else next_state = Send_NACK;
+//         end
 
-        else if(current_state == Send_ACK)
-        begin
-            if(~scl) 
-            begin
-                no_of_data_rec   <= no_of_data_rec + 1'b1;
-            end
-            if(no_of_data_rec < 2) next_state = Store_Data;
-            else next_state <= Stop;
-        end
+//         else if(current_state == Send_ACK)
+//         begin
+//             if(~scl) 
+//             begin
+//                 no_of_data_rec   <= no_of_data_rec + 1'b1;
+//             end
+//             if(no_of_data_rec < 2) next_state = Store_Data;
+//             else next_state <= Stop;
+//         end
 
-        else if(current_state == Send_NACK)
-        begin
-            next_state = Stop;
-        end
+//         else if(current_state == Send_NACK)
+//         begin
+//             next_state = Stop;
+//         end
 
-        else if(current_state == Write_Data)
-        begin
-            if(sda) next_state = Output_Data;
-            else next_state    = Write_Data;
-        end
+//         else if(current_state == Write_Data)
+//         begin
+//             if(sda) next_state = Output_Data;
+//             else next_state    = Write_Data;
+//         end
 
-        else if(current_state == Output_Data)
-        begin
-            if(data_sent)
-            begin
-                next_state = Check_ACK;
-            end
-        end
+//         else if(current_state == Output_Data)
+//         begin
+//             if(data_sent)
+//             begin
+//                 next_state = Check_ACK;
+//             end
+//         end
 
-        else if(current_state == Check_ACK)
-        begin
-            if(~scl)
-            begin
-                no_of_data_sent <= no_of_data_sent + 1'b1;
-                if(sda && no_of_data_sent < 2) next_state <= Output_Data;
-                else if(~sda) next_state = Stop;
-            end
-        end
+//         else if(current_state == Check_ACK)
+//         begin
+//             if(~scl)
+//             begin
+//                 no_of_data_sent <= no_of_data_sent + 1'b1;
+//                 if(sda && no_of_data_sent < 2) next_state <= Output_Data;
+//                 else if(~sda) next_state = Stop;
+//             end
+//         end
 
-        else if(current_state == Stop)
-        begin
-            if(count_ctrl == 4*THRESHOLD) 
-            begin
-                next_state = Idle;
-            end
-        end
-end
+//         else if(current_state == Stop)
+//         begin
+//             if(count_ctrl == 4*THRESHOLD) 
+//             begin
+//                 next_state = Idle;
+//             end
+//         end
+// end
     
     assign state_master = current_state;
     assign free = (current_state == Idle);
