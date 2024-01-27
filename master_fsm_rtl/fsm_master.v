@@ -1,3 +1,4 @@
+// Master Controller
 module fsm_master #(
     parameter FREQ_DIFF = 4,
     parameter T_LOW     = 6,
