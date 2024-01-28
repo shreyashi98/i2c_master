@@ -32,22 +32,32 @@ module sda_generate #(
     reg [3:0]           current_state;
     reg [3:0]           next_state;
     reg                 sda_reg;
-    reg [2:0]           no_of_data_rec;
-    reg [2:0]           no_of_data_sent; //See if one can be used
+    reg [1:0]           no_of_data_rec;
+    reg [1:0]           no_of_data_sent; //See if one can be used
     reg [DATA_LEN-1:0]  data_mem [1:0];
+    reg                 ack_reg;
 
     parameter Idle            = 4'b0000;
     parameter Ready           = 4'b0001;
     parameter Send_Address    = 4'b0010;
     parameter Write_Data      = 4'b0011;
     parameter Output_Data     = 4'b0100;
-    parameter Check_ACK       = 4'b0101;
+    parameter Check_ACK_data  = 4'b0101;
     parameter Read_Data       = 4'b0110;
     parameter Store_Data      = 4'b0111;
     parameter Check_for_Valid = 4'b1000;
     parameter Send_ACK        = 4'b1001;
     parameter Send_NACK       = 4'b1010;
     parameter Stop            = 4'b1011;
+    parameter Check_ACK_addr  = 4'b1100;
+
+//always block for data_mem
+// always @(posedge clk or negedge ~rst_n) begin
+//     if(~rst_n) begin
+//         data_mem[0] <= data_1;
+//         data_mem[1] <= data_2;
+//     end
+// end
 
 //always block for curr_state
     always @(posedge clk or negedge rst_n)
@@ -81,6 +91,17 @@ module sda_generate #(
             end
         end
 
+        Check_ACK_addr: begin
+            if(count_ctrl == T_LOW -SETUP_SDA - 1) begin
+                sda_reg <= 1'bz;
+            end
+        end
+
+        Write_Data: begin
+            if(count_ctrl == T_LOW -SETUP_SDA -1 && no_of_data_sent == 0) sda_reg <= data_1[DATA_LEN-1-count];
+            else if(count_ctrl == T_LOW -SETUP_SDA -1 && no_of_data_sent == 1) sda_reg <= data_2[DATA_LEN-1-count];
+        end
+
      endcase 
 
      end
@@ -104,16 +125,16 @@ module sda_generate #(
             //     end
             // end
 
-            if(current_state == Read_Data)
-            begin
-                sda_reg <= 1'bz;
-            end
+            // if(current_state == Read_Data)
+            // begin
+            //     sda_reg <= 1'bz;
+            // end
 
-            else if(current_state == Store_Data)
-            begin
-                sda_reg <= 1'bz;
-                if(~scl && ~data_received && count_ctrl/(2*THRESHOLD) <= 7) data_mem[no_of_data_rec][7 - count_ctrl/(2*THRESHOLD)] = sda;
-            end
+            // else if(current_state == Store_Data)
+            // begin
+            //     sda_reg <= 1'bz;
+            //     if(~scl && ~data_received && count_ctrl/(2*THRESHOLD) <= 7) data_mem[no_of_data_rec][7 - count_ctrl/(2*THRESHOLD)] = sda;
+            // end
 
             //else if(current_state == Check_for_Valid)
             //begin
@@ -121,43 +142,65 @@ module sda_generate #(
             //    else next_state <= Send_NACK;
             //end
 
-            else if(current_state == Send_ACK)
-            begin
-                if(~scl) 
-                begin
-                    sda_reg <= 1'b0;
-                end
-            end
+            // else if(current_state == Send_ACK)
+            // begin
+            //     if(~scl) 
+            //     begin
+            //         sda_reg <= 1'b0;
+            //     end
+            // end
 
             //else if(current_state == Send_NACK)
             //begin
             //    next_state <= Stop;
             //end
 
-            else if(current_state == Write_Data)
-            begin
-                sda_reg <= 1'bz;
-            end
+            // else if(current_state == Write_Data)
+            // begin
+            //     sda_reg <= 1'bz;
+            // end
 
-            else if(current_state == Output_Data)
-            begin
-                if(~scl && ~data_sent && count_ctrl/(2*THRESHOLD) <= 7) sda_reg <= data_mem[no_of_data_sent][7 - count_ctrl/(2*THRESHOLD)];
-            end
+            // else if(current_state == Output_Data)
+            // begin
+            //     if(~scl && ~data_sent && count_ctrl/(2*THRESHOLD) <= 7) sda_reg <= data_mem[no_of_data_sent][7 - count_ctrl/(2*THRESHOLD)];
+            // end
 
-            else if(current_state == Check_ACK)
-            begin
-                sda_reg <= 1'bz;
-            end
+        //     else if(current_state == Check_ACK)
+        //     begin
+        //         sda_reg <= 1'bz;
+        //     end
 
-            else if(current_state == Stop)
-            begin
-                if(count_ctrl == 4*THRESHOLD) 
-                begin
-                    sda_reg    <= 1'b1;
-                end
-            end
-        end
+        //     else if(current_state == Stop)
+        //     begin
+        //         if(count_ctrl == 4*THRESHOLD) 
+        //         begin
+        //             sda_reg    <= 1'b1;
+        //         end
+        //     end
+         end
     end
+
+//always block for ack_reg
+always @(posedge clk or negedge rst_n) begin
+    if(rst_n) begin
+        ack_reg <= 0;
+    end else begin
+        if(add_sent) begin
+            ack_reg <= 0;
+        end else if(scl && sda) begin
+            ack_reg <= 1;
+        end
+    end 
+end
+
+//always block for no_of_data_sent
+always @(posedge clk or negedge rst_n) begin
+    if(~rst_n) begin
+        no_of_data_sent <= 0;
+    end else begin
+        if(data_sent) no_of_data_sent <= no_of_data_sent + 1;
+    end
+end
 
 //Combo Logic for next_state
 always @(*) begin
@@ -177,9 +220,23 @@ always @(*) begin
         end
 
         Send_Address: begin
-            if(add_sent && R_W) next_state = Read_Data;
-            else if(add_sent && ~R_W) next_state = Write_Data;
+            if(add_sent) next_state = Check_ACK_addr;
         end
+
+        Check_ACK_addr: begin
+            if(~ack_reg && (count_ctrl==T_LOW+T_HIGH-1)) begin
+                if(R_W) begin
+                    next_state = Read_Data;
+                end else begin
+                    next_state = Write_Data;
+                end
+            end
+        end
+
+        Write_Data : begin
+            if(data_sent) next_state = Check_ACK_data;
+        end
+       
     endcase
 
 end
@@ -292,10 +349,9 @@ end
     
     assign state_master = current_state;
     assign free = (current_state == Idle);
-    assign rst_count = (current_state == Idle) || wait_for_sync || free || add_sent || (current_state == Read_Data) || 
-                       (current_state == Write_Data) || data_received || (current_state == Check_for_Valid) ||
-                       (current_state == Send_ACK) || (current_state == Check_ACK);
-    assign rst_count_2 = wait_for_sync || add_sent;
+    assign rst_count = (current_state == Idle) || wait_for_sync || free || add_sent || data_sent || 
+                        data_received ;
+    assign rst_count_2 = wait_for_sync || add_sent || data_sent;
     assign sda = sda_reg;
 
 endmodule

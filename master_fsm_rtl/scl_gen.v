@@ -87,7 +87,7 @@ always @(posedge clk or negedge rst_n) begin
                 end else begin
                     count_ctrl <= count_ctrl + 1;
                 end
-            end else if(state_master != Ready && state_master != Stop ) begin
+            end else if(state_master != Ready && state_master != Stop && state_master!=Idle) begin
                 if (count_ctrl == (T_LOW+T_HIGH-1)) begin
                     count_ctrl <= 0;
                 end else begin
@@ -126,7 +126,7 @@ end
     assign wait_for_sync = (count_ctrl == (SETUP_SCL_START-1)) && (state_master == Ready);
     assign add_sent      = (count      == ADDR_LEN) && (count_ctrl == T_HIGH + T_LOW -1 ) && (state_master == Send_Address);
     assign data_received = (count_ctrl == 2*DATA_LEN*THRESHOLD) && (state_master == Store_Data);
-    assign data_sent     = (count_ctrl == 2*DATA_LEN*THRESHOLD) && (state_master == Output_Data);
-    assign count_inc     = (count_ctrl == T_HIGH + T_LOW - 1) && (state_master == Send_Address);
+    assign data_sent     = (count      == DATA_LEN-1) &&(count_ctrl == T_HIGH + T_LOW - 1) &&(state_master == Write_Data);
+    assign count_inc     = (count_ctrl == T_HIGH + T_LOW - 1) && (state_master == Send_Address || state_master == Write_Data);
 
 endmodule

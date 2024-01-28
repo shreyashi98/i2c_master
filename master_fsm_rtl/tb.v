@@ -51,7 +51,7 @@ initial begin
     #CLK_PERIOD rst_n=1; start=0; add_reg={ADDR_LEN{1'b0}}; R_W=0; data_1={DATA_LEN{1'b0}}; data_2={DATA_LEN{1'b0}};
     #CLK_PERIOD rst_n=0;
     #CLK_PERIOD rst_n=1;
-    #CLK_PERIOD start=1; add_reg=7'b1010110;
+    #CLK_PERIOD start=1; add_reg=7'b1010110; data_1 = 8'hab ; data_2 = 8'hef;
 end
 
 endmodule
