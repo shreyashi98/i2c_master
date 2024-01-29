@@ -109,14 +109,23 @@ always @(posedge clk or negedge rst_n) begin
             if (count_ctrl == SETUP_SCL_START-1) begin
                 scl <= 1'b0;
             end
-        end else if(state_master != Ready && state_master != Stop && state_master != Idle) begin
-            if(count_ctrl < T_LOW -1 || count_ctrl == (T_HIGH + T_LOW -1)) begin
+        end else if(state_master != Ready && state_master != Idle && state_master != Stop) begin
+            if(count_ctrl < T_LOW -1 || count_ctrl == (T_HIGH + T_LOW -1) ) begin
                 scl <= 1'b0;
             end else begin
                 scl <= 1'b1;
             end
-        end else if(state_master == Stop) begin
-            if(count_ctrl == 2*THRESHOLD) begin
+        end
+        else if(state_master == Idle) begin
+            scl <= 1'bz;
+        end
+        else if(state_master == Stop) begin
+            if(count_ctrl < T_LOW -1) begin
+                scl <= 1'b0;
+            end else if (count_ctrl == T_HIGH+T_LOW -1 ) begin
+                scl <= 1'bz;
+            end
+            else  begin
                 scl <= 1'b1;
             end
         end
