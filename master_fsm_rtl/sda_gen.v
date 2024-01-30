@@ -22,6 +22,7 @@ module sda_generate #(
     input                       R_W,
     input [DATA_LEN-1:0]        data_1,
     input [DATA_LEN-1:0]        data_2,
+    input                       ack_3p,
     inout                       sda,
     output                      rst_count,
     output                      rst_count_2,
@@ -73,7 +74,7 @@ module sda_generate #(
         case (current_state) 
 
         Idle: begin
-            sda_reg <= 1'bz;
+            sda_reg <= 1'b1;
         end
 
         Ready : begin
@@ -107,7 +108,13 @@ module sda_generate #(
             end
         end
 
-        // Read_Data
+        Read_Data: begin
+            if(count_ctrl == T_LOW -SETUP_SDA -1 && no_of_data_sent == 0) data_mem[no_of_data_sent][DATA_LEN-1-count] <= sda;
+        end
+
+        Send_ACK: begin
+            if(count_ctrl == T_LOW -SETUP_SDA - 1) sda_reg <= ~ack_3p;
+        end
 
         Stop: begin
             if (count_ctrl == T_HIGH+T_LOW -1 ) begin
@@ -132,7 +139,7 @@ always @(posedge clk or negedge rst_n) begin
     end else begin
         if(add_sent || data_sent) begin
             ack_reg <= 0;
-        end else if((state_master == Check_ACK_addr || state_master == Check_ACK_data) &&scl && sda) begin
+        end else if((state_master == Check_ACK_addr || state_master == Check_ACK_data) && scl && sda) begin
             ack_reg <= 1;
         end
     end 
@@ -143,7 +150,7 @@ always @(posedge clk or negedge rst_n) begin
     if(~rst_n) begin
         no_of_data_sent <= 0;
     end else begin
-        if(data_sent) no_of_data_sent <= no_of_data_sent + 1'b1;
+        if(data_sent || data_received) no_of_data_sent <= no_of_data_sent + 1'b1;
         if(current_state == Idle) begin
             no_of_data_sent <= 0;
         end
@@ -194,6 +201,16 @@ always @(*) begin
             else if (no_of_data_sent == 2 && (count_ctrl == T_LOW + T_HIGH - 1)) next_state = Stop;
         end
 
+        Read_Data: begin
+            if(data_received) next_state = Send_ACK;
+        end
+
+        Send_ACK: begin
+            if(no_of_data_sent < 2 && ack_3p && (count_ctrl==T_LOW+T_HIGH-1)) next_state = Read_Data;
+            else if(no_of_data_sent < 2 && ~ack_3p && (count_ctrl==T_LOW+T_HIGH-1)) next_state = Stop;
+            else if(no_of_data_sent == 2 && (count_ctrl==T_LOW+T_HIGH-1)) next_state = Stop;
+        end
+
         Stop: begin
             if((count_ctrl==T_LOW+T_HIGH-1)) next_state = Idle;
         end
@@ -207,7 +224,7 @@ end
     assign free = (current_state == Idle);
     assign rst_count = (current_state == Idle) || wait_for_sync || free || add_sent || data_sent || 
                         data_received ;
-    assign rst_count_2 = wait_for_sync || add_sent || data_sent;
+    assign rst_count_2 = wait_for_sync || add_sent || data_sent || data_received;
     assign sda = sda_reg;
 
 endmodule

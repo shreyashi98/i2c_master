@@ -16,13 +16,15 @@ module fsm_master #(
         input                   R_W,
         input [DATA_LEN-1:0]    data_1,
         input [DATA_LEN-1:0]    data_2,
+        input                   ack_3p,
         output                  scl,
         inout                   sda,
+        output [3:0]            state_master,
         output                  free
     );
 
 
-    wire [3:0] state_master;
+    //wire [3:0] state_master;
     wire [6:0] count_ctrl;
     wire [3:0] count;
     wire       count_inc;
@@ -77,6 +79,7 @@ module fsm_master #(
             .R_W                (R_W            ),
             .data_1             (data_1         ),
             .data_2             (data_2         ),
+            .ack_3p             (ack_3p         ),
             .sda                (sda            ),
             .rst_count          (rst_count      ),
             .rst_count_2        (rst_count_2    ),

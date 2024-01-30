@@ -35,44 +35,6 @@ module scl_generate #(
     parameter Send_NACK       = 4'b1010;
     parameter Stop            = 4'b1011;
 
-    
-    // always @(posedge clk)
-    // begin
-    //     if(rst_count) count_ctrl = 0;
-    //     else
-    //     begin
-    //         count_ctrl = count_ctrl + 1'b1;
-
-    //         if(state_master == Ready)
-    //         begin
-    //             if(count_ctrl == 4*THRESHOLD) 
-    //             begin
-    //                 scl   = 1'b0;
-    //                 count_ctrl = 0;
-    //             end
-    //             else 
-    //             begin
-    //                 scl   = 1'b1;
-    //             end
-    //         end
-    //         else if(state_master != Ready && state_master != Stop)
-    //         begin
-    //             if(count_ctrl == THRESHOLD)
-    //             begin
-    //                 scl   = ~scl;
-    //                 count_ctrl = 0;
-    //             end
-    //         end
-    //         else if(state_master == Stop)
-    //         begin
-    //             if(count_ctrl == 2*THRESHOLD)
-    //             begin
-    //                 scl = 1'b1;
-    //             end
-    //         end
-    //     end
-    // end 
-
 //always block for count_ctrl
 always @(posedge clk or negedge rst_n) begin
     if(~rst_n) begin
@@ -117,7 +79,7 @@ always @(posedge clk or negedge rst_n) begin
             end
         end
         else if(state_master == Idle) begin
-            scl <= 1'bz;
+            scl <= 1'b1;
         end
         else if(state_master == Stop) begin
             if(count_ctrl < T_LOW -1) begin
@@ -134,8 +96,8 @@ end
 
     assign wait_for_sync = (count_ctrl == (SETUP_SCL_START-1)) && (state_master == Ready);
     assign add_sent      = (count      == ADDR_LEN) && (count_ctrl == T_HIGH + T_LOW -1 ) && (state_master == Send_Address);
-    assign data_received = (count_ctrl == 2*DATA_LEN*THRESHOLD) && (state_master == Store_Data);
-    assign data_sent     = (count      == DATA_LEN-1) &&(count_ctrl == T_HIGH + T_LOW - 1) &&(state_master == Write_Data);
-    assign count_inc     = (count_ctrl == T_HIGH + T_LOW - 1) && (state_master == Send_Address || state_master == Write_Data);
+    assign data_received = (count      == DATA_LEN-1) && (count_ctrl == T_HIGH + T_LOW - 1) && (state_master == Read_Data);
+    assign data_sent     = (count      == DATA_LEN-1) && (count_ctrl == T_HIGH + T_LOW - 1) && (state_master == Write_Data);
+    assign count_inc     = (count_ctrl == T_HIGH + T_LOW - 1) && (state_master == Send_Address || state_master == Write_Data|| state_master == Read_Data);
 
 endmodule
