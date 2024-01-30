@@ -107,6 +107,8 @@ module sda_generate #(
             end
         end
 
+        // Read_Data
+
         Stop: begin
             if (count_ctrl == T_HIGH+T_LOW -1 ) begin
                 sda_reg <= 1'bz;
@@ -116,6 +118,7 @@ module sda_generate #(
                 sda_reg <= 0;
             end
         end
+    
         
      endcase 
 
@@ -124,12 +127,12 @@ module sda_generate #(
 
 //always block for ack_reg
 always @(posedge clk or negedge rst_n) begin
-    if(rst_n) begin
+    if(~rst_n) begin
         ack_reg <= 0;
     end else begin
         if(add_sent || data_sent) begin
             ack_reg <= 0;
-        end else if(scl && sda) begin
+        end else if((state_master == Check_ACK_addr || state_master == Check_ACK_data) &&scl && sda) begin
             ack_reg <= 1;
         end
     end 

@@ -5,6 +5,7 @@ module fsm_master #(
     parameter T_HIGH    = 4,
     parameter ADDR_LEN  = 7,
     parameter SETUP_SCL_START = 4,
+    parameter SETUP_SDA_START = 2,
     parameter DATA_LEN  = 8
                             )
     (
@@ -59,6 +60,7 @@ module fsm_master #(
     sda_generate #(
         .THRESHOLD          (FREQ_DIFF/2    ),
         .ADDR_LEN           (ADDR_LEN       ),
+        .SETUP_SDA_START    (SETUP_SDA_START),
         .DATA_LEN           (DATA_LEN       )
         ) SDA(
             .clk                (clk            ),
