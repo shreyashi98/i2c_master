@@ -72,7 +72,7 @@ end
 task START_TEST(input[ADDR_LEN-1:0] addr, input r_w);
     begin
         wait(free);
-        rst_n=1; start=1; data_1 =8'hab; data_2 = 8'hab; R_W=r_w;add_reg=addr; 
+        rst_n=1; start=1; data_1 =8'hab; data_2 = 8'hab; R_W=r_w;add_reg=addr; output_value_valid = 0;
         #CLK_PERIOD; 
         start = 0;
         if(free) begin
@@ -82,25 +82,27 @@ task START_TEST(input[ADDR_LEN-1:0] addr, input r_w);
         else begin
             $display("Operation Started successfully..");
         end
+        repeat(2) begin
         wait(state_master == 4'b0110);
         output_value_valid = 1;
-        #(T_LOW-SETUP_SDA-1) dummy = 1;
-        #(T_LOW+T_HIGH) dummy = 0;
-        #(T_LOW+T_HIGH);
+        #((T_LOW-SETUP_SDA-1)*CLK_PERIOD) dummy = 1;
+        #((T_LOW+T_HIGH)*CLK_PERIOD) dummy = 0;
+        #((T_LOW+T_HIGH)*CLK_PERIOD);
         dummy = 1;
-        #(T_LOW+T_HIGH);
+        #((T_LOW+T_HIGH)*CLK_PERIOD);
         dummy = 1;
-        #(T_LOW+T_HIGH);
+        #((T_LOW+T_HIGH)*CLK_PERIOD);
         dummy = 1;
-        #(T_LOW+T_HIGH);
+        #((T_LOW+T_HIGH)*CLK_PERIOD);
         dummy = 0;
-        #(T_LOW+T_HIGH);
+        #((T_LOW+T_HIGH)*CLK_PERIOD);
         dummy = 0;
-        #(T_LOW+T_HIGH);
+        #((T_LOW+T_HIGH)*CLK_PERIOD);
         dummy = 1;
         ack_3p = 1;
-        #(T_LOW+T_HIGH);
+        #((T_LOW+T_HIGH)*CLK_PERIOD);
         output_value_valid = 1'b0;
+        end
         //START_TEST_checker;
         //SEND_ADDR_checker(addr);
     end
