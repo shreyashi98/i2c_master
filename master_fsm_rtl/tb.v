@@ -2,13 +2,13 @@ module tb_;
 
 parameter ADDR_LEN = 7;
 parameter DATA_LEN = 8;
-parameter FREQ_DIFF = 4;
+//parameter FREQ_DIFF = 4;
 parameter SETUP_SDA_START=2;
 parameter SETUP_SCL_START=4;
+parameter SETUP_SDA_STOP = 2;
 parameter T_LOW         = 6;
 parameter T_HIGH        = 4;
 parameter SETUP_SDA     = 3;
-
 
 reg clk;
 reg rst_n;
@@ -27,11 +27,15 @@ reg output_value_valid;
 
 
 fsm_master #(
-    .FREQ_DIFF              (FREQ_DIFF),
-    .ADDR_LEN               (ADDR_LEN),
+    //.FREQ_DIFF              (FREQ_DIFF),
+    .T_LOW                  (T_LOW          ),
+    .T_HIGH                 (T_HIGH         ),
+    .ADDR_LEN               (ADDR_LEN       ),
     .SETUP_SCL_START        (SETUP_SCL_START),
     .SETUP_SDA_START        (SETUP_SDA_START),
-    .DATA_LEN               (DATA_LEN)
+    .SETUP_SDA              (SETUP_SDA      ),
+    .SETUP_SDA_STOP         (SETUP_SDA_STOP ),
+    .DATA_LEN               (DATA_LEN       )
 ) FSM_MASTER_DUT
 (
     .clk                (clk        ),
@@ -65,7 +69,7 @@ end
 
 initial begin
     #CLK_PERIOD RST_TEST;
-    #CLK_PERIOD START_TEST(7'b1010110, 1);
+    #CLK_PERIOD START_TEST(7'b1010110, 0);
     
 end
 
@@ -83,6 +87,7 @@ task START_TEST(input[ADDR_LEN-1:0] addr, input r_w);
             $display("Operation Started successfully..");
         end
         repeat(2) begin
+        wait(state_master == 4'b1001);
         wait(state_master == 4'b0110);
         output_value_valid = 1;
         #((T_LOW-SETUP_SDA-1)*CLK_PERIOD) dummy = 1;

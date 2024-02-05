@@ -1,5 +1,5 @@
 module scl_generate #(
-    parameter THRESHOLD     = 2,
+    //parameter THRESHOLD     = 2,
     parameter T_LOW         = 6,
     parameter T_HIGH        = 4,  //SCL is LOW for T_LOW*CLK_PERIOD and HIGH for T_HIGH*CLK_PERIOD
     parameter ADDR_LEN      = 7,

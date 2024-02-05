@@ -1,11 +1,13 @@
 // Master Controller
 module fsm_master #(
-    parameter FREQ_DIFF = 4,
+    //parameter FREQ_DIFF = 4,
     parameter T_LOW     = 6,
     parameter T_HIGH    = 4,
     parameter ADDR_LEN  = 7,
     parameter SETUP_SCL_START = 4,
     parameter SETUP_SDA_START = 2,
+    parameter SETUP_SDA = 3,
+    parameter SETUP_SDA_STOP = 2,
     parameter DATA_LEN  = 8
                             )
     (
@@ -36,7 +38,7 @@ module fsm_master #(
     wire       data_sent;
 
     scl_generate #(
-        .THRESHOLD          (FREQ_DIFF/2    ),
+        //.THRESHOLD          (FREQ_DIFF/2    ),
         .T_LOW              (T_LOW          ),
         .T_HIGH             (T_HIGH         ),
         .ADDR_LEN           (ADDR_LEN       ),
@@ -60,10 +62,14 @@ module fsm_master #(
         );
     
     sda_generate #(
-        .THRESHOLD          (FREQ_DIFF/2    ),
+        //.THRESHOLD          (FREQ_DIFF/2    ),
         .ADDR_LEN           (ADDR_LEN       ),
         .SETUP_SDA_START    (SETUP_SDA_START),
-        .DATA_LEN           (DATA_LEN       )
+        .SETUP_SDA_STOP     (SETUP_SDA_STOP ),
+        .SETUP_SDA          (SETUP_SDA      ),
+        .DATA_LEN           (DATA_LEN       ),
+        .T_LOW              (T_LOW          ),
+        .T_HIGH             (T_HIGH         )
         ) SDA(
             .clk                (clk            ),
             .rst_n              (rst_n          ),

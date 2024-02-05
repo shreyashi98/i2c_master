@@ -1,5 +1,5 @@
 module sda_generate #(
-    parameter THRESHOLD         = 2,
+    //parameter THRESHOLD         = 2,
     parameter ADDR_LEN          = 7,
     parameter DATA_LEN          = 8,
     parameter SETUP_SDA_START   = 2,
@@ -43,10 +43,10 @@ module sda_generate #(
     parameter Ready           = 4'b0001;
     parameter Send_Address    = 4'b0010;
     parameter Write_Data      = 4'b0011;
-    parameter Output_Data     = 4'b0100;
+    //parameter Output_Data     = 4'b0100;
     parameter Check_ACK_data  = 4'b0101;
     parameter Read_Data       = 4'b0110;
-    parameter Store_Data      = 4'b0111;
+    //parameter Store_Data      = 4'b0111;
     parameter Check_for_Valid = 4'b1000;
     parameter Send_ACK        = 4'b1001;
     parameter Send_NACK       = 4'b1010;
