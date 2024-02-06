@@ -1,4 +1,4 @@
-module slave_tb;
+module slave_tb2;
 
     wire sda_pin;
     reg sda;
@@ -18,12 +18,11 @@ module slave_tb;
     always #2.5 clk <= ~clk;*/
 
     initial begin
-        $dumpfile("slave.vcd"); 
-        $dumpvars(0, slave_tb);
+        $dumpfile("slave2.vcd"); 
+        $dumpvars(0, slave_tb2);
         $monitor($time," scl = %b sda = %b address_counter = %d",scl,sda, S1.address_counter);
         write_inout = 1; sda = 1; scl = 1;
-        #5 sda = 1; scl = 1; 
-        data_received = 8'hA8;
+        #5 sda = 1; scl = 1;
         #5 sda = 0;
         #5 scl = 0;
         #5 sda = 1;
@@ -40,30 +39,30 @@ module slave_tb;
         #5 scl = 1;
         #5 scl = 0; sda = 1;
         #5 scl = 1;
-        #5 scl = 0; sda = 1;
+        #5 scl = 0; sda = 0;
         #5 scl = 1;
         #5 write_inout = 0; scl = 0;
         #5 scl = 1;
-        #5 scl = 0;
+        #5 scl = 0; write_inout = 1; sda = 1;
         #5 scl = 1;
-        #5 scl = 0;
+        #5 scl = 0; sda = 1;
         #5 scl = 1;
-        #5 scl = 0;
+        #5 scl = 0; sda = 0;
         #5 scl = 1;
-        #5 scl = 0;
+        #5 scl = 0; sda = 0;
         #5 scl = 1;
-        #5 scl = 0;
+        #5 scl = 0; sda = 1;
         #5 scl = 1;
-        #5 scl = 0;
+        #5 scl = 0; sda = 1;
         #5 scl = 1;
-        #5 scl = 0;
+        #5 scl = 0; sda = 0;
         #5 scl = 1;
-        #5 scl = 0;
+        #5 scl = 0; sda = 0;
         #5 scl = 1;
-        #5 scl = 0; write_inout = 1; sda = 0;
+        #5 scl = 0; write_inout = 0;
         #5 scl = 1;
 
-        #5 scl = 0;
+        #5 scl = 0;write_inout = 1;
         #5 scl = 1;
         #5 scl = 0;
         
