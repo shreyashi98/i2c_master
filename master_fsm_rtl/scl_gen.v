@@ -20,20 +20,16 @@ module scl_generate #(
     output             count_inc
 );
 
-    
 
     parameter Idle            = 4'b0000;
     parameter Ready           = 4'b0001;
     parameter Send_Address    = 4'b0010;
-    parameter Write_Data      = 4'b0011;
-    parameter Output_Data     = 4'b0100;
-    parameter Check_ACK       = 4'b0101;
+    parameter Check_ACK_addr  = 4'b0011;
+    parameter Write_Data      = 4'b0100;
+    parameter Check_ACK_data  = 4'b0101;
     parameter Read_Data       = 4'b0110;
-    parameter Store_Data      = 4'b0111;
-    parameter Check_for_Valid = 4'b1000;
-    parameter Send_ACK        = 4'b1001;
-    parameter Send_NACK       = 4'b1010;
-    parameter Stop            = 4'b1011;
+    parameter Send_ACK        = 4'b0111;
+    parameter Stop            = 4'b1000;
 
 //always block for count_ctrl
 always @(posedge clk or negedge rst_n) begin
@@ -65,7 +61,7 @@ end
 //always block for scl
 always @(posedge clk or negedge rst_n) begin
     if (~rst_n) begin
-        scl <= 1; //check
+        scl <= 1'b1; //check
     end else begin
         if (state_master == Ready) begin
             if (count_ctrl == SETUP_SCL_START-1) begin
@@ -85,7 +81,7 @@ always @(posedge clk or negedge rst_n) begin
             if(count_ctrl < T_LOW -1) begin
                 scl <= 1'b0;
             end else if (count_ctrl == T_HIGH+T_LOW -1 ) begin
-                scl <= 1'bz;
+                scl <= 1'b1;
             end
             else  begin
                 scl <= 1'b1;

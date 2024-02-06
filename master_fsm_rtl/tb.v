@@ -2,7 +2,6 @@ module tb_;
 
 parameter ADDR_LEN = 7;
 parameter DATA_LEN = 8;
-//parameter FREQ_DIFF = 4;
 parameter SETUP_SDA_START=2;
 parameter SETUP_SCL_START=4;
 parameter SETUP_SDA_STOP = 2;
@@ -18,16 +17,15 @@ reg R_W;
 reg [DATA_LEN-1:0] data_1;
 reg [DATA_LEN-1:0] data_2;
 reg                ack_3p;
-reg dummy;
+reg sda_reg;
 wire scl;
 wire sda;
 wire[3:0] state_master;
 wire free;
-reg output_value_valid;
+reg inout_drive;
 
 
 fsm_master #(
-    //.FREQ_DIFF              (FREQ_DIFF),
     .T_LOW                  (T_LOW          ),
     .T_HIGH                 (T_HIGH         ),
     .ADDR_LEN               (ADDR_LEN       ),
@@ -49,10 +47,11 @@ fsm_master #(
     .scl                (scl        ),
     .sda                (sda        ),
     .state_master       (state_master),
+    //.output_value_valid (output_value_valid),
     .free               (free       )
 );
 
-assign sda = (output_value_valid==1'b1)? dummy : 8'hZZ;
+assign sda = (inout_drive==1'b1)? sda_reg: 1'bz;
 
 localparam CLK_PERIOD = 10;
 always #(CLK_PERIOD/2) clk=~clk;
@@ -69,14 +68,16 @@ end
 
 initial begin
     #CLK_PERIOD RST_TEST;
-    #CLK_PERIOD START_TEST(7'b1010110, 0);
+    #CLK_PERIOD START_TEST(7'b1010110, 1);
     
 end
 
 task START_TEST(input[ADDR_LEN-1:0] addr, input r_w);
+reg[3:0] cnt;
+reg[DATA_LEN-1:0] d1;
     begin
         wait(free);
-        rst_n=1; start=1; data_1 =8'hab; data_2 = 8'hab; R_W=r_w;add_reg=addr; output_value_valid = 0;
+        rst_n=1; start=1; data_1 =8'hab; data_2 = 8'hab; R_W=r_w;add_reg=addr; inout_drive = 0; sda_reg=1'bz;
         #CLK_PERIOD; 
         start = 0;
         if(free) begin
@@ -86,30 +87,38 @@ task START_TEST(input[ADDR_LEN-1:0] addr, input r_w);
         else begin
             $display("Operation Started successfully..");
         end
-        repeat(2) begin
-        wait(state_master == 4'b1001);
         wait(state_master == 4'b0110);
-        output_value_valid = 1;
-        #((T_LOW-SETUP_SDA-1)*CLK_PERIOD) dummy = 1;
-        #((T_LOW+T_HIGH)*CLK_PERIOD) dummy = 0;
-        #((T_LOW+T_HIGH)*CLK_PERIOD);
-        dummy = 1;
-        #((T_LOW+T_HIGH)*CLK_PERIOD);
-        dummy = 1;
-        #((T_LOW+T_HIGH)*CLK_PERIOD);
-        dummy = 1;
-        #((T_LOW+T_HIGH)*CLK_PERIOD);
-        dummy = 0;
-        #((T_LOW+T_HIGH)*CLK_PERIOD);
-        dummy = 0;
-        #((T_LOW+T_HIGH)*CLK_PERIOD);
-        dummy = 1;
-        ack_3p = 1;
-        #((T_LOW+T_HIGH)*CLK_PERIOD);
-        output_value_valid = 1'b0;
+        inout_drive = 1;
+        cnt=0;
+        d1=8'b10111001;
+        repeat(DATA_LEN) begin
+            if(cnt == 0) begin
+                #((T_LOW-SETUP_SDA-1)*CLK_PERIOD) sda_reg=d1[DATA_LEN-cnt-1];
+                cnt=cnt+1;
+            end else begin
+                #((T_LOW+T_HIGH)*CLK_PERIOD) sda_reg=d1[DATA_LEN-cnt-1];
+                cnt=cnt+1;
+            end
         end
-        //START_TEST_checker;
-        //SEND_ADDR_checker(addr);
+        wait(state_master == 4'b0111);
+        inout_drive = 0;
+        ack_3p = 1;
+        wait(state_master == 4'b0110);
+        inout_drive = 1;
+        cnt=0;
+        d1=8'b10001011;
+        repeat(DATA_LEN) begin
+            if(cnt == 0) begin
+                #((T_LOW-SETUP_SDA-1)*CLK_PERIOD) sda_reg=d1[DATA_LEN-cnt-1];
+                cnt=cnt+1;
+            end else begin
+                #((T_LOW+T_HIGH)*CLK_PERIOD) sda_reg=d1[DATA_LEN-cnt-1];
+                cnt=cnt+1;
+            end
+        end
+        wait(state_master == 4'b0111);
+        inout_drive = 0;
+        ack_3p = 1;
     end
 endtask
 
@@ -157,7 +166,7 @@ endtask
 task RST_TEST;
     begin
         @(posedge clk)
-        rst_n = 1'b0; start=0; add_reg={ADDR_LEN{1'b0}}; R_W=0; data_1={DATA_LEN{1'b0}}; data_2={DATA_LEN{1'b0}};
+        rst_n = 1'b0; start=0; add_reg={ADDR_LEN{1'b0}}; R_W=0; data_1={DATA_LEN{1'b0}}; data_2={DATA_LEN{1'b0}}; ack_3p = 0; sda_reg = 1'bz; inout_drive=0;
         wait(CLK_PERIOD);
         if(~free || ~sda || ~scl) begin
             $display("RST_TEST FAILED");

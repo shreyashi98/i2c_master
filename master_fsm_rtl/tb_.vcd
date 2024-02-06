@@ -1,5 +1,5 @@
 $date
-	Wed Jan 31 15:01:55 2024
+	Tue Feb 06 11:58:27 2024
 $end
 $version
 	Icarus Verilog
@@ -18,9 +18,9 @@ $var reg 7 ' add_reg [6:0] $end
 $var reg 1 ( clk $end
 $var reg 8 ) data_1 [7:0] $end
 $var reg 8 * data_2 [7:0] $end
-$var reg 1 + dummy $end
-$var reg 1 , output_value_valid $end
-$var reg 1 - rst_n $end
+$var reg 1 + inout_drive $end
+$var reg 1 , rst_n $end
+$var reg 1 - sda_reg $end
 $var reg 1 . start $end
 $scope module FSM_MASTER_DUT $end
 $var wire 1 % R_W $end
@@ -29,7 +29,7 @@ $var wire 7 / add_reg [6:0] $end
 $var wire 1 ( clk $end
 $var wire 8 0 data_1 [7:0] $end
 $var wire 8 1 data_2 [7:0] $end
-$var wire 1 - rst_n $end
+$var wire 1 , rst_n $end
 $var wire 1 ! sda $end
 $var wire 1 . start $end
 $var wire 1 2 wait_for_sync $end
@@ -46,7 +46,7 @@ $var wire 4 : count [3:0] $end
 $var wire 1 ; add_sent $end
 $scope module COUNTER $end
 $var wire 1 ( clk $end
-$var wire 1 - rst_n $end
+$var wire 1 , rst_n $end
 $var wire 1 4 rst_count_2 $end
 $var wire 1 8 count_inc $end
 $var reg 4 < count [3:0] $end
@@ -58,7 +58,7 @@ $var wire 4 = count [3:0] $end
 $var wire 1 8 count_inc $end
 $var wire 1 7 data_received $end
 $var wire 1 6 data_sent $end
-$var wire 1 - rst_n $end
+$var wire 1 , rst_n $end
 $var wire 1 2 wait_for_sync $end
 $var wire 4 > state_master [3:0] $end
 $var wire 1 5 rst_count $end
@@ -77,31 +77,36 @@ $var wire 8 C data_1 [7:0] $end
 $var wire 8 D data_2 [7:0] $end
 $var wire 1 7 data_received $end
 $var wire 1 6 data_sent $end
+$var wire 8 E dout_1 [7:0] $end
+$var wire 8 F dout_2 [7:0] $end
 $var wire 1 5 rst_count $end
 $var wire 1 4 rst_count_2 $end
-$var wire 1 - rst_n $end
+$var wire 1 , rst_n $end
 $var wire 1 # scl $end
 $var wire 1 ! sda $end
 $var wire 1 . start $end
-$var wire 4 E state_master [3:0] $end
+$var wire 4 G state_master [3:0] $end
 $var wire 1 2 wait_for_sync $end
+$var wire 1 H output_value_valid $end
 $var wire 1 $ free $end
-$var reg 1 F ack_reg $end
-$var reg 4 G current_state [3:0] $end
-$var reg 4 H next_state [3:0] $end
-$var reg 2 I no_of_data_sent [1:0] $end
-$var reg 1 J sda_reg $end
+$var reg 1 I ack_reg $end
+$var reg 4 J current_state [3:0] $end
+$var reg 4 K next_state [3:0] $end
+$var reg 2 L no_of_data_sent [1:0] $end
+$var reg 1 M sda_reg $end
 $upscope $end
 $upscope $end
 $scope task RST_TEST $end
 $upscope $end
 $scope task SEND_ADDR_checker $end
-$var reg 7 K addr [6:0] $end
-$var reg 1 L count $end
+$var reg 7 N addr [6:0] $end
+$var reg 1 O count $end
 $upscope $end
 $scope task START_TEST $end
-$var reg 7 M addr [6:0] $end
-$var reg 1 N r_w $end
+$var reg 7 P addr [6:0] $end
+$var reg 4 Q cnt [3:0] $end
+$var reg 8 R d1 [7:0] $end
+$var reg 1 S r_w $end
 $upscope $end
 $scope task START_TEST_checker $end
 $upscope $end
@@ -109,15 +114,20 @@ $upscope $end
 $enddefinitions $end
 #0
 $dumpvars
-xN
-bx M
-xL
+xS
+bx R
+bx Q
+bx P
+xO
+bx N
+xM
+bx L
 bx K
-xJ
-bx I
-bx H
+bx J
+xI
+xH
 bx G
-xF
+bx F
 bx E
 bx D
 bx C
@@ -163,29 +173,34 @@ $end
 #15
 15
 04
+z!
+0H
 06
 07
 0;
 02
 08
-b0 H
+b0 K
 b0 :
 b0 <
 b0 =
 b0 A
-b0 I
-0F
-1J
+b0 L
+0I
+1M
 1$
 b0 "
 b0 3
 b0 >
-b0 E
 b0 G
+b0 J
 1#
 b0 9
 b0 ?
 b0 B
+0+
+z-
+0&
 b0 *
 b0 1
 b0 D
@@ -197,25 +212,26 @@ b0 '
 b0 /
 b0 @
 0.
-0-
+0,
 1(
 #20
 0(
 #25
 05
+1!
+1H
 0$
 b1 "
 b1 3
 b1 >
-b1 E
 b1 G
-1!
-b1 H
+b1 J
+b1 K
 1(
-0,
 b1010110 '
 b1010110 /
 b1010110 @
+1%
 b10101011 *
 b10101011 1
 b10101011 D
@@ -223,9 +239,9 @@ b10101011 )
 b10101011 0
 b10101011 C
 1.
-1-
-0N
-b1010110 M
+1,
+1S
+b1010110 P
 #30
 0(
 #35
@@ -237,18 +253,18 @@ b1 B
 #40
 0(
 #45
+0!
 b10 9
 b10 ?
 b10 B
-0!
-0J
+0M
 1(
 #50
 0(
 #55
 15
 14
-b10 H
+b10 K
 12
 b11 9
 b11 ?
@@ -267,8 +283,8 @@ b0 B
 b10 "
 b10 3
 b10 >
-b10 E
 b10 G
+b10 J
 1(
 #70
 0(
@@ -288,7 +304,7 @@ b10 B
 0(
 #95
 1!
-1J
+1M
 b11 9
 b11 ?
 b11 B
@@ -368,7 +384,7 @@ b10 B
 0(
 #195
 0!
-0J
+0M
 b11 9
 b11 ?
 b11 B
@@ -448,7 +464,7 @@ b10 B
 0(
 #295
 1!
-1J
+1M
 b11 9
 b11 ?
 b11 B
@@ -528,7 +544,7 @@ b10 B
 0(
 #395
 0!
-0J
+0M
 b11 9
 b11 ?
 b11 B
@@ -608,7 +624,7 @@ b10 B
 0(
 #495
 1!
-1J
+1M
 b11 9
 b11 ?
 b11 B
@@ -766,7 +782,7 @@ b10 B
 0(
 #695
 0!
-0J
+0M
 b11 9
 b11 ?
 b11 B
@@ -845,6 +861,8 @@ b10 B
 #790
 0(
 #795
+1!
+1M
 b11 9
 b11 ?
 b11 B
@@ -890,7 +908,7 @@ b1000 B
 #855
 15
 14
-b1100 H
+b11 K
 1;
 18
 b1001 9
@@ -908,11 +926,11 @@ b0 9
 b0 ?
 b0 B
 0#
-b1100 "
-b1100 3
-b1100 >
-b1100 E
-b1100 G
+b11 "
+b11 3
+b11 >
+b11 G
+b11 J
 b0 :
 b0 <
 b0 =
@@ -928,6 +946,8 @@ b1 B
 #880
 0(
 #885
+z!
+0H
 b10 9
 b10 ?
 b10 B
@@ -935,8 +955,7 @@ b10 B
 #890
 0(
 #895
-z!
-zJ
+zM
 b11 9
 b11 ?
 b11 B
@@ -980,7 +999,7 @@ b1000 B
 #950
 0(
 #955
-b11 H
+b110 K
 b1001 9
 b1001 ?
 b1001 B
@@ -988,15 +1007,18 @@ b1001 B
 #960
 0(
 #965
+b10111001 R
+b0 Q
+1+
 b0 9
 b0 ?
 b0 B
 0#
-b11 "
-b11 3
-b11 >
-b11 E
-b11 G
+b110 "
+b110 3
+b110 >
+b110 G
+b110 J
 1(
 #970
 0(
@@ -1011,12 +1033,14 @@ b1 B
 b10 9
 b10 ?
 b10 B
+1!
 1(
+b1 Q
+1-
 #990
 0(
 #995
-1!
-1J
+b1xxxxxxx E
 b11 9
 b11 ?
 b11 B
@@ -1091,12 +1115,14 @@ b1 B
 b10 9
 b10 ?
 b10 B
+0!
 1(
+b10 Q
+0-
 #1090
 0(
 #1095
-0!
-0J
+b10xxxxxx E
 b11 9
 b11 ?
 b11 B
@@ -1171,12 +1197,14 @@ b1 B
 b10 9
 b10 ?
 b10 B
+1!
 1(
+b11 Q
+1-
 #1190
 0(
 #1195
-1!
-1J
+b101xxxxx E
 b11 9
 b11 ?
 b11 B
@@ -1252,11 +1280,11 @@ b10 9
 b10 ?
 b10 B
 1(
+b100 Q
 #1290
 0(
 #1295
-0!
-0J
+b1011xxxx E
 b11 9
 b11 ?
 b11 B
@@ -1332,11 +1360,11 @@ b10 9
 b10 ?
 b10 B
 1(
+b101 Q
 #1390
 0(
 #1395
-1!
-1J
+b10111xxx E
 b11 9
 b11 ?
 b11 B
@@ -1411,12 +1439,14 @@ b1 B
 b10 9
 b10 ?
 b10 B
+0!
 1(
+b110 Q
+0-
 #1490
 0(
 #1495
-0!
-0J
+b101110xx E
 b11 9
 b11 ?
 b11 B
@@ -1492,11 +1522,11 @@ b10 9
 b10 ?
 b10 B
 1(
+b111 Q
 #1590
 0(
 #1595
-1!
-1J
+b1011100x E
 b11 9
 b11 ?
 b11 B
@@ -1571,10 +1601,14 @@ b1 B
 b10 9
 b10 ?
 b10 B
+1!
 1(
+b1000 Q
+1-
 #1690
 0(
 #1695
+b10111001 E
 b11 9
 b11 ?
 b11 B
@@ -1620,8 +1654,8 @@ b1000 B
 #1755
 15
 14
-b101 H
-16
+b111 K
+17
 18
 b1001 9
 b1001 ?
@@ -1630,20 +1664,24 @@ b1001 B
 #1760
 0(
 #1765
+z!
+1H
 05
 04
 08
-06
+07
+1&
+0+
 b0 9
 b0 ?
 b0 B
 0#
-b101 "
-b101 3
-b101 >
-b101 E
-b101 G
-b1 I
+b111 "
+b111 3
+b111 >
+b111 G
+b111 J
+b1 L
 b0 :
 b0 <
 b0 =
@@ -1666,8 +1704,8 @@ b10 B
 #1790
 0(
 #1795
-z!
-zJ
+0!
+0M
 b11 9
 b11 ?
 b11 B
@@ -1711,7 +1749,7 @@ b1000 B
 #1850
 0(
 #1855
-b11 H
+b110 K
 b1001 9
 b1001 ?
 b1001 B
@@ -1719,15 +1757,20 @@ b1001 B
 #1860
 0(
 #1865
+1!
+0H
+b10001011 R
+b0 Q
+1+
 b0 9
 b0 ?
 b0 B
 0#
-b11 "
-b11 3
-b11 >
-b11 E
-b11 G
+b110 "
+b110 3
+b110 >
+b110 G
+b110 J
 1(
 #1870
 0(
@@ -1743,11 +1786,12 @@ b10 9
 b10 ?
 b10 B
 1(
+b1 Q
 #1890
 0(
 #1895
-1!
-1J
+zM
+b1xxxxxxx F
 b11 9
 b11 ?
 b11 B
@@ -1822,12 +1866,14 @@ b1 B
 b10 9
 b10 ?
 b10 B
+0!
 1(
+b10 Q
+0-
 #1990
 0(
 #1995
-0!
-0J
+b10xxxxxx F
 b11 9
 b11 ?
 b11 B
@@ -1903,11 +1949,11 @@ b10 9
 b10 ?
 b10 B
 1(
+b11 Q
 #2090
 0(
 #2095
-1!
-1J
+b100xxxxx F
 b11 9
 b11 ?
 b11 B
@@ -1983,11 +2029,11 @@ b10 9
 b10 ?
 b10 B
 1(
+b100 Q
 #2190
 0(
 #2195
-0!
-0J
+b1000xxxx F
 b11 9
 b11 ?
 b11 B
@@ -2062,12 +2108,14 @@ b1 B
 b10 9
 b10 ?
 b10 B
+1!
 1(
+b101 Q
+1-
 #2290
 0(
 #2295
-1!
-1J
+b10001xxx F
 b11 9
 b11 ?
 b11 B
@@ -2142,12 +2190,14 @@ b1 B
 b10 9
 b10 ?
 b10 B
+0!
 1(
+b110 Q
+0-
 #2390
 0(
 #2395
-0!
-0J
+b100010xx F
 b11 9
 b11 ?
 b11 B
@@ -2222,12 +2272,14 @@ b1 B
 b10 9
 b10 ?
 b10 B
+1!
 1(
+b111 Q
+1-
 #2490
 0(
 #2495
-1!
-1J
+b1000101x F
 b11 9
 b11 ?
 b11 B
@@ -2303,9 +2355,11 @@ b10 9
 b10 ?
 b10 B
 1(
+b1000 Q
 #2590
 0(
 #2595
+b10001011 F
 b11 9
 b11 ?
 b11 B
@@ -2351,8 +2405,8 @@ b1000 B
 #2655
 15
 14
-b101 H
-16
+b111 K
+17
 18
 b1001 9
 b1001 ?
@@ -2361,20 +2415,23 @@ b1001 B
 #2660
 0(
 #2665
+z!
+1H
 05
 04
 08
-06
+07
+0+
 b0 9
 b0 ?
 b0 B
 0#
-b101 "
-b101 3
-b101 >
-b101 E
-b101 G
-b10 I
+b111 "
+b111 3
+b111 >
+b111 G
+b111 J
+b10 L
 b0 :
 b0 <
 b0 =
@@ -2397,8 +2454,8 @@ b10 B
 #2690
 0(
 #2695
-z!
-zJ
+0!
+0M
 b11 9
 b11 ?
 b11 B
@@ -2442,7 +2499,7 @@ b1000 B
 #2750
 0(
 #2755
-b1011 H
+b1000 K
 b1001 9
 b1001 ?
 b1001 B
@@ -2454,17 +2511,15 @@ b0 9
 b0 ?
 b0 B
 0#
-b1011 "
-b1011 3
-b1011 >
-b1011 E
-b1011 G
+b1000 "
+b1000 3
+b1000 >
+b1000 G
+b1000 J
 1(
 #2770
 0(
 #2775
-0!
-0J
 b1 9
 b1 ?
 b1 B
@@ -2515,16 +2570,16 @@ b111 B
 #2840
 0(
 #2845
+1!
 b1000 9
 b1000 ?
 b1000 B
-1!
-1J
+1M
 1(
 #2850
 0(
 #2855
-b0 H
+b0 K
 b1001 9
 b1001 ?
 b1001 B
@@ -2533,26 +2588,24 @@ b1001 B
 0(
 #2865
 15
+0H
+z!
 b1010 9
 b1010 ?
 b1010 B
-z#
 1$
 b0 "
 b0 3
 b0 >
-b0 E
 b0 G
-z!
-zJ
+b0 J
+zM
 1(
 #2870
 0(
 #2875
-b0 I
-1!
-1J
-1#
+b0 L
+1M
 b0 9
 b0 ?
 b0 B

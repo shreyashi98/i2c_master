@@ -27,6 +27,9 @@ module sda_generate #(
     output                      rst_count,
     output                      rst_count_2,
     output [3:0]                state_master,
+    output [DATA_LEN-1:0]       dout_1,
+    output [DATA_LEN-1:0]       dout_2,
+    //output                      output_value_valid,
     output                      free
                                            );
 
@@ -38,20 +41,22 @@ module sda_generate #(
     reg [1:0]           no_of_data_sent; //See if one can be used
     reg [DATA_LEN-1:0]  data_mem [1:0];
     reg                 ack_reg;
+    wire                output_value_valid;
 
     parameter Idle            = 4'b0000;
     parameter Ready           = 4'b0001;
     parameter Send_Address    = 4'b0010;
-    parameter Write_Data      = 4'b0011;
-    //parameter Output_Data     = 4'b0100;
+    parameter Check_ACK_addr  = 4'b0011;
+    parameter Write_Data      = 4'b0100;
     parameter Check_ACK_data  = 4'b0101;
     parameter Read_Data       = 4'b0110;
-    //parameter Store_Data      = 4'b0111;
-    parameter Check_for_Valid = 4'b1000;
-    parameter Send_ACK        = 4'b1001;
-    parameter Send_NACK       = 4'b1010;
-    parameter Stop            = 4'b1011;
-    parameter Check_ACK_addr  = 4'b1100;
+    parameter Send_ACK        = 4'b0111;
+    parameter Stop            = 4'b1000;
+
+
+    assign sda = output_value_valid ? sda_reg : 1'bz;
+    assign dout_1 = data_mem[0];
+    assign dout_2 =data_mem[1];
 
 
 //always block for curr_state
@@ -109,7 +114,10 @@ module sda_generate #(
         end
 
         Read_Data: begin
-            if(count_ctrl == T_LOW -SETUP_SDA -1 && no_of_data_sent == 0) data_mem[no_of_data_sent][DATA_LEN-1-count] <= sda;
+            if(count_ctrl == T_LOW -SETUP_SDA -1) begin
+                data_mem[no_of_data_sent][DATA_LEN-1-count] <= sda;
+                sda_reg <= 1'bz;
+            end
         end
 
         Send_ACK: begin
@@ -222,9 +230,9 @@ end
     
     assign state_master = current_state;
     assign free = (current_state == Idle);
-    assign rst_count = (current_state == Idle) || wait_for_sync || free || add_sent || data_sent || 
-                        data_received ;
+    assign rst_count = (current_state == Idle) || wait_for_sync || free || add_sent || data_sent || data_received ;
     assign rst_count_2 = wait_for_sync || add_sent || data_sent || data_received;
-    assign sda = sda_reg;
+    assign output_value_valid = !((current_state == Read_Data )||(current_state == Idle) || ((current_state == Check_ACK_data || current_state == Check_ACK_addr) && count_ctrl >= (T_LOW - SETUP_SDA-1)));
+    //assign sda = sda_reg;
 
 endmodule
