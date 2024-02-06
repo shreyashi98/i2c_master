@@ -1,5 +1,5 @@
 $date
-	Tue Feb 06 11:58:27 2024
+	Tue Feb 06 12:09:31 2024
 $end
 $version
 	Icarus Verilog
@@ -2588,8 +2588,8 @@ b1001 B
 0(
 #2865
 15
-0H
 z!
+0H
 b1010 9
 b1010 ?
 b1010 B
@@ -2599,13 +2599,11 @@ b0 3
 b0 >
 b0 G
 b0 J
-zM
 1(
 #2870
 0(
 #2875
 b0 L
-1M
 b0 9
 b0 ?
 b0 B

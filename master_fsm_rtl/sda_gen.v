@@ -126,7 +126,7 @@ module sda_generate #(
 
         Stop: begin
             if (count_ctrl == T_HIGH+T_LOW -1 ) begin
-                sda_reg <= 1'bz;
+                sda_reg <= 1'b1;
             end else if(count_ctrl >= T_LOW + SETUP_SDA_STOP -1) begin
                 sda_reg <= 1; 
             end else begin
